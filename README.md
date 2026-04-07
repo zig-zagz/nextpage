@@ -1,4 +1,6 @@
-![nextpage logo](./assets/nextpage.png)
+<p align="center">
+  <img src="assets/nextpage.png" alt="nextpage logo" width="320" />
+</p>
 
 # nextpage
 

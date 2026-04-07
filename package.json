@@ -1,0 +1,40 @@
+{
+  "name": "nextpage",
+  "version": "0.1.0",
+  "description": "Flatten a bounded area of a Next.js app into a compact AI-friendly bundle.",
+  "type": "module",
+  "bin": {
+    "nextpage": "dist/cli.js"
+  },
+  "files": [
+    "dist"
+  ],
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "dev": "tsx src/cli.ts",
+    "start": "node dist/cli.js",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  },
+  "keywords": [
+    "nextjs",
+    "cli",
+    "ai",
+    "refactor",
+    "app-router"
+  ],
+  "license": "MIT",
+  "dependencies": {
+    "clipboardy": "^4.0.0",
+    "commander": "^12.1.0",
+    "prompts": "^2.4.2",
+    "typescript": "^5.6.3"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.1",
+    "@types/prompts": "^2.4.9",
+    "tsx": "^4.19.2"
+  }
+}
