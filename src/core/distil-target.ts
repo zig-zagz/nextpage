@@ -2,13 +2,13 @@ import { collectContextFiles } from "./collect-context-files.js";
 import { detectProject } from "./detect-project.js";
 import { discoverRoutes } from "./discover-routes.js";
 import { formatCompact } from "./format-compact.js";
-import { formatBundle } from "./format-bundle.js";
+import { formatMarkdownContext } from "./format-markdown-context.js";
 import { formatPaths } from "./format-paths.js";
 import { selectTarget } from "./select-target.js";
 import { traceDependencies } from "./trace-dependencies.js";
-import type { PackOptions, PackResult } from "../types.js";
+import type { DistilOptions, DistilResult } from "../types.js";
 
-export async function packRoute(options: PackOptions): Promise<PackResult> {
+export async function distilTarget(options: DistilOptions): Promise<DistilResult> {
   const project = await detectProject(options.cwd);
   const discoveredRoutes = await discoverRoutes(project);
   const selection = await selectTarget({
@@ -62,7 +62,7 @@ export async function packRoute(options: PackOptions): Promise<PackResult> {
       return formatPaths(partialResult);
     }
 
-    return formatBundle(partialResult);
+    return formatMarkdownContext(partialResult);
   })();
 
   return {

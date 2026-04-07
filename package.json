@@ -1,10 +1,10 @@
 {
-  "name": "nextpage",
+  "name": "next-distil",
   "version": "0.1.0",
-  "description": "Flatten a bounded area of a Next.js app into a compact AI-friendly bundle.",
+  "description": "Distil a bounded area of a Next.js app into compact AI-friendly context.",
   "type": "module",
   "bin": {
-    "nextpage": "dist/cli.js"
+    "next-distil": "dist/cli.js"
   },
   "files": [
     "dist"

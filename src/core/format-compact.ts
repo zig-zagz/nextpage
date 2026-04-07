@@ -1,6 +1,6 @@
 import path from "node:path";
 
-import type { IncludedFile, PackResult } from "../types.js";
+import type { DistilResult, IncludedFile } from "../types.js";
 
 function languageFromExtension(filePath: string): string {
   const extension = path.extname(filePath).slice(1).toLowerCase();
@@ -24,10 +24,10 @@ function formatFile(file: IncludedFile): string {
   ].join("\n");
 }
 
-export function formatCompact(result: Omit<PackResult, "output">): string {
+export function formatCompact(result: Omit<DistilResult, "output">): string {
   const lines: string[] = [];
 
-  lines.push("# Bundle");
+  lines.push("# Distilled Context");
   lines.push(`Target: ${result.target}`);
   lines.push(`Type: ${result.targetType}`);
   lines.push(`Entry: ${path.relative(result.project.root, result.entryFile)}`);

@@ -1,8 +1,8 @@
-# nextpage v1 CLI Spec
+# next-distil v1 CLI Spec
 
 ## Product Intent
 
-`nextpage` flattens a bounded area of a Next.js codebase into a compact bundle that can be pasted into an LLM.
+`next-distil` distils a bounded area of a Next.js codebase into compact context that can be pasted into an LLM.
 
 The tool is responsible for:
 
@@ -29,15 +29,15 @@ This should remain the core architecture. New features should slot into one of t
 
 ## Primary Use Cases
 
-- Flatten a single App Router page and its immediate UI context.
-- Flatten a route while prioritizing `use client` components.
-- Flatten a single file and its local dependencies.
-- Produce a smaller bundle by limiting traversal depth, file count, or character count.
+- Distil a single App Router page and its immediate UI context.
+- Distil a route while prioritizing `use client` components.
+- Distil a single file and its local dependencies.
+- Produce a smaller distilled context by limiting traversal depth, file count, or character count.
 - Exclude known noise such as tests, stories, mocks, icons, or generated files.
 
 ## Non-Goals
 
-- No AI-generated summaries inside the bundle.
+- No AI-generated summaries inside the distilled context.
 - No inferred design-system advice.
 - No cross-page intelligence as a core requirement.
 - No attempt to decide what the user is "really asking" beyond the provided flags and config.
@@ -46,20 +46,20 @@ This should remain the core architecture. New features should slot into one of t
 
 The CLI should expose three top-level commands:
 
-- `pack <target>`
+- `distil <target>`
 - `discover`
 - `print-config`
 
-### `pack <target>`
+### `distil <target>`
 
-Bundles a route or file into a compact LLM-friendly output.
+Distils a route or file into compact LLM-friendly context.
 
 Examples:
 
 ```bash
-nextpage pack /settings/profile
-nextpage pack /settings/profile --focus client --trace local
-nextpage pack app/settings/profile/page.tsx --target-type file --trace direct
+next-distil distil /settings/profile
+next-distil distil /settings/profile --focus client --trace local
+next-distil distil app/settings/profile/page.tsx --target-type file --trace direct
 ```
 
 ### `discover`
@@ -69,8 +69,8 @@ Lists available route targets.
 Examples:
 
 ```bash
-nextpage discover
-nextpage discover --verbose
+next-distil discover
+next-distil discover --verbose
 ```
 
 ### `print-config`
@@ -80,11 +80,11 @@ Prints the resolved config after merging defaults, config file values, and CLI f
 Examples:
 
 ```bash
-nextpage print-config
-nextpage print-config --json
+next-distil print-config
+next-distil print-config --json
 ```
 
-## `pack` Options
+## `distil` Options
 
 ### Target Selection
 
@@ -171,7 +171,7 @@ nextpage print-config --json
 
 The CLI should support a project-level config file:
 
-- `.nextpagerc.json`
+- `.next-distilrc.json`
 
 Example:
 
@@ -196,7 +196,7 @@ Resolution order:
 
 `print-config` should show the final resolved values.
 
-## Bundle Semantics
+## Distilled Context Semantics
 
 The output should stay compact and deterministic.
 
@@ -231,7 +231,7 @@ Avoid long prose.
 Example:
 
 ```md
-# Bundle
+# Distilled Context
 Target: /settings/profile
 Files: 6
 
@@ -336,7 +336,7 @@ The current codebase already has the correct skeleton. v1 should refactor toward
   - resolves route or file input into entry files
 
 - `src/core/load-config.ts`
-  - loads and merges `.nextpagerc.json`
+  - loads and merges `.next-distilrc.json`
 
 - `src/core/classify-file.ts`
   - classifies files for include/exclude rules
@@ -361,7 +361,7 @@ The current codebase already has the correct skeleton. v1 should refactor toward
 - `src/core/trace-dependencies.ts`
   - split traversal from prioritization and filtering
 
-- `src/core/format-bundle.ts`
+- `src/core/format-markdown-context.ts`
   - treat as the `markdown` formatter rather than the default formatter
 
 - `src/cli.ts`
@@ -378,7 +378,7 @@ type FocusMode = "client" | "server" | "all";
 type TraceMode = "direct" | "local" | "full";
 type OutputFormat = "compact" | "markdown" | "paths";
 
-interface PackConfig {
+interface DistilConfig {
   targetType?: TargetType;
   scope: ScopeMode;
   focus: FocusMode;
@@ -426,7 +426,7 @@ v1 is successful if a user can:
 - bias toward `use client` code when needed
 - control prompt size with hard limits
 - exclude obvious noise
-- receive a compact, deterministic bundle with minimal prose
+- receive compact, deterministic distilled context with minimal prose
 
 ## Summary
 

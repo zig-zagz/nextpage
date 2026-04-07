@@ -1,5 +1,5 @@
 import type { DiscoveredRoute, RouteResolution } from "../types.js";
-import { NextPackAiError } from "../errors.js";
+import { NextDistilError } from "../errors.js";
 import { normalizeRoute } from "../utils/path.js";
 
 function formatSuggestionList(routes: DiscoveredRoute[]): string[] {
@@ -20,7 +20,7 @@ export function resolveRoute(route: string, discoveredRoutes: DiscoveredRoute[])
   }
 
   if (matches.length > 1) {
-    throw new NextPackAiError(
+    throw new NextDistilError(
       `Route ${normalizedRoute} is ambiguous.`,
       matches.map((item) => item.entryFile),
     );
@@ -29,7 +29,7 @@ export function resolveRoute(route: string, discoveredRoutes: DiscoveredRoute[])
   const similar = discoveredRoutes.filter((item) => item.route.includes(normalizedRoute) || normalizedRoute.includes(item.route));
   const suggestions = similar.length > 0 ? similar : discoveredRoutes;
 
-  throw new NextPackAiError(
+  throw new NextDistilError(
     `Could not resolve route ${normalizedRoute}.`,
     formatSuggestionList(suggestions),
   );

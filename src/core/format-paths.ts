@@ -1,6 +1,6 @@
-import type { PackResult } from "../types.js";
+import type { DistilResult } from "../types.js";
 
-export function formatPaths(result: Omit<PackResult, "output">): string {
+export function formatPaths(result: Omit<DistilResult, "output">): string {
   const lines = [
     `Target: ${result.target}`,
     `Type: ${result.targetType}`,

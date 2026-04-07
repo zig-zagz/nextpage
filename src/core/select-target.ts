@@ -1,6 +1,6 @@
 import path from "node:path";
 
-import { NextPackAiError } from "../errors.js";
+import { NextDistilError } from "../errors.js";
 import type { DiscoveredRoute, ProjectInfo, SelectedTarget, TargetType } from "../types.js";
 import { isFile } from "../utils/fs.js";
 import { normalizeRoute } from "../utils/path.js";
@@ -18,11 +18,11 @@ async function resolveFileTarget(
 ): Promise<SelectedTarget> {
   const candidate = path.isAbsolute(target) ? path.normalize(target) : path.resolve(cwd, target);
   if (!(await isFile(candidate))) {
-    throw new NextPackAiError(`Could not resolve file target ${target}.`);
+    throw new NextDistilError(`Could not resolve file target ${target}.`);
   }
 
   if (!isWithinDirectory(project.root, candidate)) {
-    throw new NextPackAiError(
+    throw new NextDistilError(
       `File target ${target} is outside the detected project root.`,
       [project.root],
     );

@@ -80,7 +80,7 @@ export interface TraceResult {
   truncationReasons: string[];
 }
 
-export interface PackOptions {
+export interface DistilOptions {
   cwd: string;
   target: string;
   targetType?: TargetType | undefined;
@@ -95,7 +95,7 @@ export interface PackOptions {
   maxChars?: number | undefined;
 }
 
-export interface PackResult {
+export interface DistilResult {
   project: ProjectInfo;
   target: string;
   targetType: TargetType;

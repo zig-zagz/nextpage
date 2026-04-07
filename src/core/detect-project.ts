@@ -1,7 +1,7 @@
 import path from "node:path";
 import ts from "typescript";
 
-import { NextPackAiError } from "../errors.js";
+import { NextDistilError } from "../errors.js";
 import type { AliasPattern, ProjectInfo } from "../types.js";
 import { findUp, isDirectory, pathExists, readJsonFile } from "../utils/fs.js";
 
@@ -48,7 +48,7 @@ function loadCompilerOptions(projectRoot: string): {
     const configFile = ts.readConfigFile(configPath, ts.sys.readFile);
     if (configFile.error) {
       const message = ts.flattenDiagnosticMessageText(configFile.error.messageText, "\n");
-      throw new NextPackAiError(`Failed to read ${fileName}: ${message}`);
+      throw new NextDistilError(`Failed to read ${fileName}: ${message}`);
     }
 
     const parsed = ts.parseJsonConfigFileContent(configFile.config, ts.sys, projectRoot, undefined, configPath);
@@ -56,7 +56,7 @@ function loadCompilerOptions(projectRoot: string): {
       const details = parsed.errors.map((error) =>
         ts.flattenDiagnosticMessageText(error.messageText, "\n"),
       );
-      throw new NextPackAiError(`Failed to parse ${fileName}.`, details);
+      throw new NextDistilError(`Failed to parse ${fileName}.`, details);
     }
 
     const compilerOptions: ts.CompilerOptions = {
@@ -86,7 +86,7 @@ function loadCompilerOptions(projectRoot: string): {
 export async function detectProject(cwd: string): Promise<ProjectInfo> {
   const packageJsonPath = await findUp(cwd, "package.json");
   if (!packageJsonPath) {
-    throw new NextPackAiError("No package.json found in this directory or its parents.");
+    throw new NextDistilError("No package.json found in this directory or its parents.");
   }
 
   const root = path.dirname(packageJsonPath);
@@ -106,14 +106,14 @@ export async function detectProject(cwd: string): Promise<ProjectInfo> {
   })();
 
   if (!hasNextDependency && !appDir) {
-    throw new NextPackAiError(
+    throw new NextDistilError(
       "No Next.js project detected in this directory or its parents.",
       ["Expected a `next` dependency and an `app/` or `src/app/` directory."],
     );
   }
 
   if (!appDir) {
-    throw new NextPackAiError(
+    throw new NextDistilError(
       "This project does not appear to use the Next.js App Router.",
       ["Expected an `app/` or `src/app/` directory."],
     );
@@ -122,7 +122,7 @@ export async function detectProject(cwd: string): Promise<ProjectInfo> {
   const { tsconfigPath, compilerOptions, aliasPatterns } = loadCompilerOptions(root);
 
   if (tsconfigPath && !(await pathExists(tsconfigPath))) {
-    throw new NextPackAiError(`Resolved tsconfig path does not exist: ${tsconfigPath}`);
+    throw new NextDistilError(`Resolved tsconfig path does not exist: ${tsconfigPath}`);
   }
 
   return {

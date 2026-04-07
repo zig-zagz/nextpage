@@ -6,10 +6,10 @@ import clipboard from "clipboardy";
 import { Command } from "commander";
 import prompts from "prompts";
 
-import { NextPackAiError } from "./errors.js";
+import { NextDistilError } from "./errors.js";
 import { detectProject } from "./core/detect-project.js";
+import { distilTarget } from "./core/distil-target.js";
 import { discoverRoutes } from "./core/discover-routes.js";
-import { packRoute } from "./core/pack-route.js";
 import type {
   DiscoveredRoute,
   ExcludeCategory,
@@ -54,7 +54,7 @@ const SCOPE_MODES: ScopeMode[] = ["strict", "context"];
 function normalizeCommandArguments(argv: string[]): string[] {
   const [nodePath = "", scriptPath = "", command, ...rest] = argv;
 
-  if (command === "pack") {
+  if (command === "distil") {
     return [nodePath, scriptPath, ...rest];
   }
 
@@ -96,7 +96,7 @@ function assertAllowedValues<T extends string>(
   const allowedSet = new Set<string>(allowed);
   for (const value of values) {
     if (!allowedSet.has(value)) {
-      throw new NextPackAiError(`Invalid value for ${flagName}: ${value}.`, [
+      throw new NextDistilError(`Invalid value for ${flagName}: ${value}.`, [
         `Allowed values: ${allowed.join(", ")}`,
       ]);
     }
@@ -140,12 +140,12 @@ async function promptForRoute(routes: DiscoveredRoute[]): Promise<string> {
     const response = await prompts({
       type: "select",
       name: "route",
-      message: "Select a route to pack",
+      message: "Select a route to distil",
       choices: uniqueRoutes.map((route) => ({ title: route, value: route })),
     });
 
     if (!response.route) {
-      throw new NextPackAiError("Route selection was cancelled.");
+      throw new NextDistilError("Route selection was cancelled.");
     }
 
     return response.route as string;
@@ -159,7 +159,7 @@ async function promptForRoute(routes: DiscoveredRoute[]): Promise<string> {
   });
 
   if (!response.route) {
-    throw new NextPackAiError("Route input was cancelled.");
+    throw new NextDistilError("Route input was cancelled.");
   }
 
   return normalizeRoute(response.route as string);
@@ -196,11 +196,11 @@ function printSummary(args: {
   }
 
   if (args.copied) {
-    console.log("Copied bundle to clipboard.");
+    console.log("Copied distilled context to clipboard.");
   }
 
   if (args.savedPath) {
-    console.log(`Saved bundle to ${args.savedPath}`);
+    console.log(`Saved distilled context to ${args.savedPath}`);
   }
 }
 
@@ -209,10 +209,10 @@ async function run(): Promise<void> {
   const program = new Command();
 
   program
-    .name("nextpage")
-    .description("Flatten a Next.js route or file and its local context into one AI-friendly bundle.")
+    .name("next-distil")
+    .description("Distil a Next.js route or file into compact AI-friendly context.")
     .argument("[target]", "Public route such as / or /home, or a file path")
-    .option("--scope <scope>", "Bundle scope: strict or context", "context")
+    .option("--scope <scope>", "Distillation scope: strict or context", "context")
     .option("--mode <scope>", "Alias for --scope")
     .option("--target-type <type>", "Target type: route or file")
     .option("--focus <focus>", "Focus mode: client, server, or all", "all")
@@ -220,9 +220,9 @@ async function run(): Promise<void> {
     .option("--format <format>", "Output format: compact, markdown, or paths", "compact")
     .option("--include <items>", "Comma-separated include categories")
     .option("--exclude <items>", "Comma-separated exclude categories")
-    .option("--save <path>", "Save the generated bundle to a file")
-    .option("--stdout", "Print the generated bundle to stdout", false)
-    .option("--no-clipboard", "Do not copy the generated bundle to the clipboard")
+    .option("--save <path>", "Save the generated distilled context to a file")
+    .option("--stdout", "Print the generated distilled context to stdout", false)
+    .option("--no-clipboard", "Do not copy the generated distilled context to the clipboard")
     .option("--discover", "List discovered public routes and exit", false)
     .option("--print-config", "Print the resolved CLI options and exit", false)
     .option("--max-depth <number>", "Maximum import depth to trace", (value) => parsePositiveInteger(value, "--max-depth"))
@@ -280,14 +280,14 @@ async function run(): Promise<void> {
       : await promptForRoute(routes);
 
   if (!target) {
-    throw new NextPackAiError("No target was provided.");
+    throw new NextDistilError("No target was provided.");
   }
 
   const normalizedTarget = targetType === "route" || (!targetType && target.startsWith("/"))
     ? normalizeRoute(target)
     : target;
 
-  const result = await packRoute({
+  const result = await distilTarget({
     cwd: process.cwd(),
     target: normalizedTarget,
     targetType,
@@ -332,14 +332,14 @@ async function run(): Promise<void> {
     const safeName = result.targetType === "route"
       ? routeToSafeFileName(result.target)
       : routeToSafeFileName(path.relative(result.project.root, result.entryFile).replaceAll(path.sep, "/"));
-    const defaultOutputPath = path.join(process.cwd(), ".nextpage", `${safeName}.md`);
+    const defaultOutputPath = path.join(process.cwd(), ".next-distil", `${safeName}.md`);
     savedPath = await writeOutput(defaultOutputPath, result.output);
-    console.log(`Saved bundle to ${savedPath}`);
+    console.log(`Saved distilled context to ${savedPath}`);
   }
 }
 
 run().catch((error: unknown) => {
-  if (error instanceof NextPackAiError) {
+  if (error instanceof NextDistilError) {
     console.error(`Error: ${error.message}`);
     if (error.details && error.details.length > 0) {
       for (const detail of error.details) {

@@ -1,6 +1,6 @@
 import path from "node:path";
 
-import type { IncludedFile, PackResult } from "../types.js";
+import type { DistilResult, IncludedFile } from "../types.js";
 
 function languageFromExtension(filePath: string): string {
   const extension = path.extname(filePath).slice(1).toLowerCase();
@@ -30,10 +30,10 @@ function formatFileBlock(file: IncludedFile): string {
   ].join("\n");
 }
 
-export function formatBundle(result: Omit<PackResult, "output">): string {
+export function formatMarkdownContext(result: Omit<DistilResult, "output">): string {
   const lines: string[] = [];
 
-  lines.push("# AI Refactor Bundle", "");
+  lines.push("# Distilled Context", "");
   lines.push(`- Target: \`${result.target}\``);
   lines.push(`- Target type: \`${result.targetType}\``);
   lines.push(`- Entry: \`${path.relative(result.project.root, result.entryFile)}\``);

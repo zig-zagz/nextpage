@@ -1,10 +1,10 @@
 <p align="center">
-  <img src="assets/nextpage.png" alt="nextpage logo" width="320" />
+  <img src="assets/next-distil.png" alt="next-distil logo" width="320" />
 </p>
 
-# nextpage
+# next-distil
 
-`nextpage` is a small TypeScript CLI for flattening a bounded area of a Next.js app into a compact bundle that an LLM can read easily.
+`next-distil` is a small TypeScript CLI for distilling a bounded area of a Next.js app into compact context that an LLM can read easily.
 
 The point is not to interpret your code for you. The point is to give you a clean, narrow slice of code to paste into an LLM without dumping the whole repo.
 
@@ -36,8 +36,8 @@ In real projects, styles and component structure often drift page by page. When 
 - can include styles and JSON
 - can exclude noisy file categories
 - outputs the result as `compact`, `markdown`, or `paths`
-- copies the bundle to the clipboard by default
-- can also save the bundle to disk or print it to stdout
+- copies the distilled context to the clipboard by default
+- can also save the distilled context to disk or print it to stdout
 
 ## What It Does Not Do
 
@@ -46,7 +46,7 @@ In real projects, styles and component structure often drift page by page. When 
 - it does not do design audits
 - it does not try to be an autonomous code-review agent
 
-It is a scoping and flattening tool.
+It is a scoping and distillation tool.
 
 ## Core Idea
 
@@ -74,7 +74,7 @@ The CLI detects the Next.js app from the directory you run it in, so you normall
 From this repo:
 
 ```bash
-cd /Users/jackz/Documents/PROJECTS/nextpage
+cd /path/to/next-distil
 npm install
 npm run build
 npm link
@@ -84,13 +84,13 @@ Then from any Next.js app:
 
 ```bash
 cd /path/to/your/nextjs-app
-nextpage pack /dashboard
+next-distil distil /dashboard
 ```
 
 If you change the TypeScript source, rebuild before using the linked command again:
 
 ```bash
-cd /Users/jackz/Documents/PROJECTS/nextpage
+cd /path/to/next-distil
 npm run build
 ```
 
@@ -98,21 +98,21 @@ npm run build
 
 ```bash
 cd /path/to/your/nextjs-app
-node /Users/jackz/Documents/PROJECTS/nextpage/dist/cli.js pack /dashboard
+node /path/to/next-distil/dist/cli.js distil /dashboard
 ```
 
 ### Option 3: Run the source directly during development
 
 ```bash
 cd /path/to/your/nextjs-app
-npx tsx /Users/jackz/Documents/PROJECTS/nextpage/src/cli.ts pack /dashboard
+npx tsx /path/to/next-distil/src/cli.ts distil /dashboard
 ```
 
 ## Main Commands
 
-### `pack <target>`
+### `distil <target>`
 
-Flatten one route or file into a compact AI-friendly bundle.
+Distil one route or file into compact AI-friendly context.
 
 Use this when you want to:
 
@@ -124,9 +124,9 @@ Use this when you want to:
 Examples:
 
 ```bash
-nextpage pack /settings/profile
-nextpage pack /settings/profile --focus client
-nextpage pack app/settings/profile/page.tsx --target-type file
+next-distil distil /settings/profile
+next-distil distil /settings/profile --focus client
+next-distil distil app/settings/profile/page.tsx --target-type file
 ```
 
 ### `discover`
@@ -138,8 +138,8 @@ Use this when you want to see what routes the tool can currently resolve.
 Examples:
 
 ```bash
-nextpage discover
-nextpage discover --verbose
+next-distil discover
+next-distil discover --verbose
 ```
 
 ### `print-config`
@@ -151,8 +151,8 @@ Use this when you want to understand how the current flags are being interpreted
 Examples:
 
 ```bash
-nextpage print-config
-nextpage print-config --focus client --trace local --include styles
+next-distil print-config
+next-distil print-config --focus client --trace local --include styles
 ```
 
 ## Typical Workflow
@@ -160,19 +160,19 @@ nextpage print-config --focus client --trace local --include styles
 ### 1. Find a route
 
 ```bash
-nextpage discover
+next-distil discover
 ```
 
-### 2. Flatten the route
+### 2. Distil the route
 
 ```bash
-nextpage pack /food/[id] --focus client --trace local --format compact
+next-distil distil /food/[id] --focus client --trace local --format compact
 ```
 
 ### 3. Save or print the result
 
 ```bash
-nextpage pack /food/[id] --save ./.nextpage/food-id.md --stdout
+next-distil distil /food/[id] --save ./.next-distil/food-id.md --stdout
 ```
 
 ## Output Formats
@@ -187,7 +187,7 @@ The default. Best for pasting into an LLM.
 
 ### `markdown`
 
-A richer labeled bundle.
+A richer labeled distilled context document.
 
 - more report-like
 - still includes file contents
@@ -197,7 +197,7 @@ A richer labeled bundle.
 Only print the selected files and their reasons.
 
 - useful for debugging scope
-- useful when you want to inspect what would be included before generating a full bundle
+- useful when you want to inspect what would be included before generating the full distilled context
 
 ## Flags
 
@@ -208,29 +208,29 @@ Choose whether the target is a public route or a file path.
 Examples:
 
 ```bash
-nextpage pack app/dashboard/page.tsx --target-type file
-nextpage pack /dashboard --target-type route
+next-distil distil app/dashboard/page.tsx --target-type file
+next-distil distil /dashboard --target-type route
 ```
 
 ### `--scope <strict|context>`
 
 Controls whether route context files are included.
 
-- `strict`: keep the bundle tighter
+- `strict`: keep the distilled context tighter
 - `context`: include layouts and route-local files like `loading.tsx` and `error.tsx`
 
 Examples:
 
 ```bash
-nextpage pack /dashboard --scope strict
-nextpage pack /dashboard --scope context
+next-distil distil /dashboard --scope strict
+next-distil distil /dashboard --scope context
 ```
 
 `--mode` still works as a backward-compatible alias for `--scope`.
 
 ### `--focus <client|server|all>`
 
-Controls whether the bundle should bias toward client-side or server-side files.
+Controls whether the distilled context should bias toward client-side or server-side files.
 
 - `client`: prefer `use client` modules
 - `server`: deprioritize client modules where possible
@@ -239,8 +239,8 @@ Controls whether the bundle should bias toward client-side or server-side files.
 Examples:
 
 ```bash
-nextpage pack /dashboard --focus client
-nextpage pack /dashboard --focus server
+next-distil distil /dashboard --focus client
+next-distil distil /dashboard --focus server
 ```
 
 ### `--trace <direct|local|full>`
@@ -254,14 +254,14 @@ Controls how aggressively imports are followed.
 Examples:
 
 ```bash
-nextpage pack /dashboard --trace direct
-nextpage pack /dashboard --trace local
-nextpage pack /dashboard --trace full
+next-distil distil /dashboard --trace direct
+next-distil distil /dashboard --trace local
+next-distil distil /dashboard --trace full
 ```
 
 ### `--include <csv>`
 
-Explicitly include categories that are useful for the bundle.
+Explicitly include categories that are useful for the distilled context.
 
 Supported values:
 
@@ -273,13 +273,13 @@ Supported values:
 Examples:
 
 ```bash
-nextpage pack /dashboard --include styles
-nextpage pack /dashboard --include layouts,styles,json
+next-distil distil /dashboard --include styles
+next-distil distil /dashboard --include layouts,styles,json
 ```
 
 ### `--exclude <csv>`
 
-Remove noisy categories from the bundle.
+Remove noisy categories from the distilled context.
 
 Supported values:
 
@@ -294,8 +294,8 @@ Supported values:
 Examples:
 
 ```bash
-nextpage pack /dashboard --exclude tests,stories,mocks
-nextpage pack /dashboard --exclude icons,analytics,utils
+next-distil distil /dashboard --exclude tests,stories,mocks
+next-distil distil /dashboard --exclude icons,analytics,utils
 ```
 
 ### `--max-depth <n>`
@@ -305,8 +305,8 @@ Limit how many import levels the tracer can follow.
 Examples:
 
 ```bash
-nextpage pack /dashboard --trace local --max-depth 2
-nextpage pack /dashboard --trace full --max-depth 3
+next-distil distil /dashboard --trace local --max-depth 2
+next-distil distil /dashboard --trace full --max-depth 3
 ```
 
 ### `--max-files <n>`
@@ -316,17 +316,17 @@ Hard cap on how many files can be included.
 Examples:
 
 ```bash
-nextpage pack /dashboard --max-files 15
+next-distil distil /dashboard --max-files 15
 ```
 
 ### `--max-chars <n>`
 
-Hard cap on total source characters included in the bundle.
+Hard cap on total source characters included in the distilled context.
 
 Examples:
 
 ```bash
-nextpage pack /dashboard --max-chars 25000
+next-distil distil /dashboard --max-chars 25000
 ```
 
 ### `--format <compact|markdown|paths>`
@@ -336,39 +336,39 @@ Choose the output format.
 Examples:
 
 ```bash
-nextpage pack /dashboard --format compact
-nextpage pack /dashboard --format markdown
-nextpage pack /dashboard --format paths
+next-distil distil /dashboard --format compact
+next-distil distil /dashboard --format markdown
+next-distil distil /dashboard --format paths
 ```
 
 ### `--stdout`
 
-Print the bundle to standard output.
+Print the distilled context to standard output.
 
 Example:
 
 ```bash
-nextpage pack /dashboard --stdout
+next-distil distil /dashboard --stdout
 ```
 
 ### `--save <path>`
 
-Save the bundle to disk.
+Save the distilled context to disk.
 
 Example:
 
 ```bash
-nextpage pack /dashboard --save ./.nextpage/dashboard.md
+next-distil distil /dashboard --save ./.next-distil/dashboard.md
 ```
 
 ### `--no-clipboard`
 
-Skip copying the bundle to the clipboard.
+Skip copying the distilled context to the clipboard.
 
 Example:
 
 ```bash
-nextpage pack /dashboard --no-clipboard
+next-distil distil /dashboard --no-clipboard
 ```
 
 ### `--verbose`
@@ -378,7 +378,7 @@ Show more detail in summaries and route discovery.
 Example:
 
 ```bash
-nextpage discover --verbose
+next-distil discover --verbose
 ```
 
 ## Example Use Cases
@@ -386,7 +386,7 @@ nextpage discover --verbose
 ### Refactor one page safely
 
 ```bash
-nextpage pack /settings/profile --focus client --trace local --exclude tests,stories,mocks
+next-distil distil /settings/profile --focus client --trace local --exclude tests,stories,mocks
 ```
 
 Use this when the job is local to one screen and you want the LLM to see the page plus nearby UI code.
@@ -394,15 +394,15 @@ Use this when the job is local to one screen and you want the LLM to see the pag
 ### Inspect a file without resolving a route
 
 ```bash
-nextpage pack app/food/[id]/page.tsx --target-type file --trace direct
+next-distil distil app/food/[id]/page.tsx --target-type file --trace direct
 ```
 
-Use this when you already know the exact file you want to flatten.
+Use this when you already know the exact file you want to distil.
 
-### Check scope before generating a full bundle
+### Check scope before generating the full distilled context
 
 ```bash
-nextpage pack /dashboard --format paths --trace local --include styles
+next-distil distil /dashboard --format paths --trace local --include styles
 ```
 
 Use this when you want to sanity-check what the tool will include.
@@ -410,7 +410,7 @@ Use this when you want to sanity-check what the tool will include.
 ### Keep a prompt under control
 
 ```bash
-nextpage pack /dashboard --focus client --max-files 12 --max-chars 20000 --format compact
+next-distil distil /dashboard --focus client --max-files 12 --max-chars 20000 --format compact
 ```
 
 Use this when context size matters more than completeness.
@@ -443,5 +443,5 @@ npm run typecheck
 Run locally in dev mode:
 
 ```bash
-npx tsx src/cli.ts pack /dashboard
+npx tsx src/cli.ts distil /dashboard
 ```
